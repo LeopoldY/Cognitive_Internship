@@ -41,6 +41,7 @@ class SexDataset(Dataset):
 
 def train():
     global costs
+    global Accuracy_rate
     os.makedirs('./output', exist_ok=True)
     batchsize = 10
     train_data = SexDataset(txt='sex_train.txt')
@@ -78,6 +79,7 @@ def train():
         print('Train Loss: %.6f, Acc: %.3f' % (train_loss / (math.ceil(len(train_data)/batchsize)),
                                                train_acc  / (len(train_data))))
         costs.append(train_loss / (math.ceil(len(train_data)/batchsize)))
+        Accuracy_rate.append(train_acc  / (len(train_data)))
         # evaluation--------------------------------
         model.eval()
         eval_loss = 0
@@ -98,12 +100,18 @@ def train():
 
 if __name__ == '__main__':
     costs = []
+    Accuracy_rate = []
     train()
     print('finished')
     cost = np.squeeze(costs)
-    plt.plot(cost)
-    plt.ylabel('cost')
+    acc = np.squeeze(Accuracy_rate)
+
+    plt.plot(acc,label='Accuracy rate')
+    plt.ylabel('Accuracy rate / cost')
     plt.xlabel('iterations (per Epoch)')
     plt.title("Learning rate = 0.01")
+
+    plt.plot(cost,label='Cost')
+    plt.legend()
     plt.show()
 
