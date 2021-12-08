@@ -7,6 +7,8 @@ from torch.nn.modules.linear import Linear
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import random
+import matplotlib.pyplot as plt
+import numpy as np
 
 class sexnet(nn.Module):
     def __init__(self):
@@ -38,6 +40,7 @@ class SexDataset(Dataset):
         return len(self.data)
 
 def train():
+    global costs
     os.makedirs('./output', exist_ok=True)
     batchsize = 10
     train_data = SexDataset(txt='sex_train.txt')
@@ -74,6 +77,7 @@ def train():
         scheduler.step()  # 更新learning rate
         print('Train Loss: %.6f, Acc: %.3f' % (train_loss / (math.ceil(len(train_data)/batchsize)),
                                                train_acc  / (len(train_data))))
+        costs.append(train_loss / (math.ceil(len(train_data)/batchsize)))
         # evaluation--------------------------------
         model.eval()
         eval_loss = 0
@@ -93,5 +97,13 @@ def train():
            torch.save(model.state_dict(), 'output/params_' + str(epoch + 1) + '.pth')
 
 if __name__ == '__main__':
+    costs = []
     train()
     print('finished')
+    cost = np.squeeze(costs)
+    plt.plot(cost)
+    plt.ylabel('cost')
+    plt.xlabel('iterations (per Epoch)')
+    plt.title("Learning rate = 0.01")
+    plt.show()
+
